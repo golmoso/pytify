@@ -86,19 +86,18 @@ class DataLoader():
         col_names = ['Macro BD', 'BD', 'Macro Agencia', 'Agencia', 'Año', 'Mes', 
                      'IDMesAñoBD', 'ID_TipoMedio_RUT', 'Pauta', 'Plan', 
                      'Tema Plan', 'JobNumber', 'Tema JobNumber', 'Presupuesto', 
-                     'Orden', 'Rev. Orden', 'Período', 'Cliente grupo 1', 
-                     'Cliente grupo 2', 'Cliente pseudo facturacion', 
-                     'Cliente Titular', 'Cliente Facturación', 
+                     'Orden', 'Rev. Orden', 'Periodo', 'Cliente grupo 1', 
+                     'Cliente grupo 2', 'Cliente Titular', 'Cliente Facturacion', 
                      'Producto', 'Nº Pedido Cli.', 'Nro Item', 'Campaña', 
                      'Grupo proveedor titular', 'Proveedor', 'R.U.T. Proveedor', 
                      'Proveedor Real', 'Grupo proveedor real', 
                      'Nombre del Medio', 'Zona', 'MEDIO ON/OFF', 'Tipo de Medio', 
-                     'Spots', 'Facturable', 'Inversión Total', 'Estado', 
+                     'Spots', 'Facturable', 'Inversion Total', 'Estado', 
                      'Macro Grupo de Productos', 'Grupo de Productos', 
                      'Forma de Pago (Pauta)', 'Forma de Pago (Contrato)', 
-                     'Agencia X', 'Tipo Facturación ', 'Observaciones', 
+                     'Agencia X', 'Tipo Facturacion ', 'Observaciones', 
                      'Fac. Cliente', 'Fac. Serv. Ag.', 'ERROR?', 'Grupo', 
-                     'GRUPO TABLA RUT-TDM', 'GRUPO TABLA', 'TIPO BONIFICACIÓN']
+                     'GRUPO TABLA RUT-TDM', 'GRUPO TABLA', 'TIPO BONIFICACION']
         try:
             return pd.read_csv(path, sep=';', names=col_names)
         except FileNotFoundError:
