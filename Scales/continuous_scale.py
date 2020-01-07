@@ -7,7 +7,7 @@ Created on Wed Dec 18 18:36:32 2019
 
 from scales import Scale
 
-class ContiniousScale(Scale):
+class ContinuousScale(Scale):
     """Represent a scale's child object. Attribute supplier is a
     Supplier object"""
 

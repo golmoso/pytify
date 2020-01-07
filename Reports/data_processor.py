@@ -22,7 +22,7 @@ Html a pdf
 import pandas as pd
 import numpy as np
 
-class GeneralReport():
+class DataProcessor():
     def anual_share_by(self, df, columns):
         """
         Get the anual share by 'columns'
