@@ -298,4 +298,47 @@ class DataProcessor():
         tabla.scale(3, 1.2) # change size table
         plt.savefig(img_path, transparent=True)
         return img_path
+    def get_client_share(self, full_df, scale_df, fig_num):
+        """
+
+        Parameters
+        ----------
+        full_df : Pandas DataFrame.
+        scale_df : Pandas DataFrame.
+        fig_num : int.
+
+        Returns
+        -------
+        img_path = string.
+
+        """
+        # Group share cumulative
+        share_by_client = DataProcessor().anual_share_by(full_df, 'Cliente grupo 1')
+        img_path = "client_share_pie.png"
+    
+        fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
+        wedges, texts, autotexts = ax.pie(share_by_client, autopct='%1.1f%%', textprops=dict(color="w"))
+        ax.legend(wedges, share_by_client.index,
+                  title="Cliente",
+                  loc="center left",
+                  bbox_to_anchor=(1, 0, 0.5, 1))
+        
+        plt.setp(autotexts, size=9, weight="bold")
+        ax.set_title("Client share")
+        plt.savefig(img_path)
+        plt.show()
+        return img_path
+    def get_client_share_table(self, full_df, scale_df, fig_num):
+        share_by_client = DataProcessor().anual_share_by(full_df, 'Cliente grupo 1')
+        fig, ax = plt.subplots(figsize=(3, 2)) # set size frame
+        img_path = "client_share_table.png"
+        ax.xaxis.set_visible(False)  # hide the x axis
+        ax.yaxis.set_visible(False)  # hide the y axis
+        ax.set_frame_on(False)  # no visible frame, uncomment if size is ok
+        tabla = table(ax, share_by_client, loc='upper right', colWidths=[0.17]*len(share_by_client.columns))  # where df is your data frame
+        tabla.auto_set_font_size(False) # Activate set fontsize manually
+        tabla.set_fontsize(10) # if ++fontsize is necessary ++colWidths
+        tabla.scale(3, 1.2) # change size table
+        plt.savefig(img_path, transparent=True)
+        return img_path
     
