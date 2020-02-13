@@ -285,19 +285,10 @@ class DataProcessor():
         
         plt.setp(autotexts, size=9, weight="bold")
         ax.set_title("Group share")
-        plt.savefig(img_path)
+        plt.savefig(img_path, bbox_inches='tight')
         plt.show()
         return img_path
         
-        # # Group share cumulative
-        # share_by_group = DataProcessor().anual_share_by(full_df, 'Grupo')
-        # plt.pie(share_by_group['Inversion Total'], labels=share_by_group.index, 
-        #         startangle=90, autopct='%1.1f%%')
-        # plt.title("Group Share")
-        # img_path = "group_share_pie.png"
-        # plt.savefig(img_path)
-        # plt.show()
-        # return img_path
     def get_group_share_table(self, full_df, scale_df, fig_num):
         share_by_group = DataProcessor().anual_share_by(full_df, 'Grupo')
         fig, ax = plt.subplots(figsize=(3, 2)) # set size frame
@@ -310,7 +301,7 @@ class DataProcessor():
         tabla.auto_set_font_size(False) # Activate set fontsize manually
         tabla.set_fontsize(10) # if ++fontsize is necessary ++colWidths
         tabla.scale(3, 1.2) # change size table
-        plt.savefig(img_path, transparent=True)
+        plt.savefig(img_path, transparent=True, bbox_inches='tight')
         return img_path
     def get_client_share(self, full_df, scale_df, fig_num):
         """
@@ -346,45 +337,15 @@ class DataProcessor():
         ax.axis('equal')
         h,l = zip(*[(h,lab) for h,lab,i in zip(p,share_by_client.index.values,
                                                share_by_client['Normalized'].values) if i > 1])
-        ax.legend(h, l,loc="best", bbox_to_anchor=(1,1))
-        plt.setp(a, size=9, weight="bold")
-        ax.set_title("Client share")
-        
+        # ax.legend(h, l,loc="best")
+        ax.legend(h, l, loc="best", bbox_to_anchor=(1,1))
+        plt.setp(a, size=15, weight="bold")
+        ax.set_title("Client share", size=20)
+
         # Save img
-        plt.savefig(img_path)
+        plt.savefig(img_path, bbox_inches='tight')
         plt.show()
         return img_path
-
-        
-        ######################## Client share
-        share_by_client = DataProcessor().anual_share_by(full_df, 'Cliente grupo 1')
-        fig1, ax = plt.subplots()
-        
-        # Normalize and sort values
-        investment_values = share_by_client['Inversion Total'].values
-        share_by_client['Normalized'] = investment_values/investment_values.sum()*100
-        share_by_client = share_by_client.sort_values(['Normalized'], ascending= False)
-    
-        # Plot and labels
-        p,t,a = ax.pie(share_by_client['Normalized'].values,
-                        autopct=autopct_more_than_1)
-        ax.axis('equal')
-        h,l = zip(*[(h,lab) for h,lab,i in zip(p,share_by_client.index.values,
-                                                share_by_client['Normalized'].values) if i > 1])
-        ax.legend(h, l,loc="best", bbox_to_anchor=(1, 0, 0.5, 1))
-        # ax.legend(wedges, share_by_client.index,
-        #   title="Cliente",
-        #   loc="center left",
-        #   bbox_to_anchor=(1, 0, 0.5, 1))
-        plt.setp(t, size=9, weight="bold")
-
-        # Plot info
-        plt.title("Client Share")
-        img_path = "client_share_cum.png"
-        plt.savefig(img_path)
-        plt.show()
-        return img_path
-        ######################## END Client share
     
     def get_client_share_table(self, full_df, scale_df, fig_num):
         share_by_client = DataProcessor().anual_share_by(full_df, 'Cliente grupo 1')
@@ -398,6 +359,65 @@ class DataProcessor():
         tabla.auto_set_font_size(False) # Activate set fontsize manually
         tabla.set_fontsize(10) # if ++fontsize is necessary ++colWidths
         tabla.scale(2, 1.5) # change size table
-        plt.savefig(img_path, transparent=True)
+        plt.savefig(img_path, transparent=True, bbox_inches='tight')
+        return img_path
+    
+    def get_supplier_share(self, full_df, scale_df, fig_num):
+        """
+
+        Parameters
+        ----------
+        full_df : Pandas DataFrame.
+        scale_df : Pandas DataFrame.
+        fig_num : int.
+
+        Returns
+        -------
+        img_path = string.
+
+        """
+        # Exclude values that represent less than 1 percent
+        def autopct_more_than_1(pct):
+            return ('%1.f%%' % pct) if pct > 2 else ''
+        
+        # Client share cumulative
+        share_by_supplier = DataProcessor().anual_share_by(full_df, 'Macro Grupo Tabla')
+        img_path = "supplier_share_pie.png"
+    
+        # Normalize and sort values
+        investment_values = share_by_supplier['Inversion Total'].values
+        share_by_supplier['Normalized'] = investment_values/investment_values.sum()*100
+        share_by_supplier = share_by_supplier.sort_values(['Normalized'], ascending= False)
+        
+        # Plot and labels
+        fig1, ax = plt.subplots(figsize=(5, 5))
+        p,t,a = ax.pie(share_by_supplier['Normalized'].values,
+                       autopct=autopct_more_than_1, textprops=dict(color="w"))
+        ax.axis('equal')
+        h,l = zip(*[(h,lab) for h,lab,i in zip(p,share_by_supplier.index.values,
+                                               share_by_supplier['Normalized'].values) if i > 1])
+        # ax.legend(h, l,loc="best")
+        ax.legend(h, l, loc="best", bbox_to_anchor=(1,1))
+        plt.setp(a, size=13, weight="bold")
+        ax.set_title("Supplier share", size=20)
+
+        # Save img
+        plt.savefig(img_path, bbox_inches='tight')
+        plt.show()
+        return img_path
+    
+    def get_supplier_share_table(self, full_df, scale_df, fig_num):
+        share_by_supplier = DataProcessor().anual_share_by(full_df, 'Macro Grupo Tabla')
+        share_by_supplier = share_by_supplier.sort_values(['Inversion Total'], ascending=False)[:15]
+        fig, ax = plt.subplots(figsize=(4.2, 5)) # set size frame
+        img_path = "supplier_share_table.png"
+        ax.xaxis.set_visible(False)  # hide the x axis
+        ax.yaxis.set_visible(False)  # hide the y axis
+        ax.set_frame_on(False)  # no visible frame, uncomment if size is ok
+        tabla = table(ax, share_by_supplier, loc='upper right', colWidths=[0.17]*len(share_by_supplier.columns))  # where df is your data frame
+        tabla.auto_set_font_size(False) # Activate set fontsize manually
+        tabla.set_fontsize(10) # if ++fontsize is necessary ++colWidths
+        tabla.scale(2, 1.5) # change size table
+        plt.savefig(img_path, transparent=True, bbox_inches='tight')
         return img_path
     

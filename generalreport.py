@@ -100,7 +100,7 @@ class GeneralReport():
         right_frame.addFromList(right_flowables, my_canvas)
         # my_canvas.save()
         
-    def add_group_share(self, canvas, df, img_path, table_path, title):
+    def add_group_share(self, canvas, img_path, table_path, title):
         #File info
         page_width, page_height = letter #keep for later
         styles = getSampleStyleSheet()
@@ -131,7 +131,7 @@ class GeneralReport():
         # Chart
         img = utils.ImageReader(img_path)
         img_width, img_height = img.getSize()
-        desired_width = 3.9*inch
+        desired_width = 3*inch
         aspect = img_height / float(img_width)
         img = Image(img_path, width=desired_width,
         height=(desired_width * aspect))
@@ -152,7 +152,7 @@ class GeneralReport():
         left_frame.addFromList(left_flowables, canvas)
         right_frame.addFromList(right_flowables, canvas)
         # canvas.save() #TODO sacar esta linea
-    def add_client_share(self, canvas, df, img_path, table_path, title):
+    def add_client_share(self, canvas, img_path, table_path, title):
         #File info
         page_width, page_height = letter #keep for later
         styles = getSampleStyleSheet()
@@ -168,7 +168,7 @@ class GeneralReport():
         top_frame = Frame(inch, 7.5*inch, width=1.5*inch, height=0.5*inch, showBoundary=1)
         left_frame = Frame(inch, 3.5*inch, width=3*inch, height=4*inch, showBoundary=1)
         right_frame = Frame(4*inch, 3.5*inch, width=4*inch, height=4*inch, showBoundary=1)
-        
+        #TODO center vertical
         top_flowables = []
         left_flowables = []
         right_flowables = []
@@ -204,6 +204,35 @@ class GeneralReport():
         left_frame.addFromList(left_flowables, canvas)
         right_frame.addFromList(right_flowables, canvas)
         # canvas.save() #TODO sacar esta linea
+        
+    def generate_imgs(self, df, scales_path):
+        global dict_images
+        # Group share
+        img_path = DataProcessor().get_group_share(df, df, fig_num)
+        table_path = DataProcessor().get_group_share_table(df, df, fig_num)
+        dict_images['group_share_chart'] = img_path
+        dict_images['group_share_table'] = table_path
+
+        # Client share
+        img_path = DataProcessor().get_client_share(df, df, fig_num)
+        table_path = DataProcessor().get_client_share_table(df, df, fig_num)
+        dict_images['client_share_chart'] = img_path
+        dict_images['client_share_table'] = table_path
+        
+        # Supplier share
+        img_path = DataProcessor().get_supplier_share(df, df, fig_num) #TODO change to supplier share
+        table_path = DataProcessor().get_supplier_share_table(df, df, fig_num) #TODO change to supplier table
+        dict_images['supplier_share_chart'] = img_path
+        dict_images['supplier_share_table'] = table_path
+    
+    def insert_data_in_canvas(self, my_canvas):
+        global dict_images
+        GeneralReport().add_group_share(my_canvas, dict_images['group_share_chart'], dict_images['group_share_table'], 'Grupos')
+        my_canvas.showPage()
+        GeneralReport().add_client_share(my_canvas, dict_images['client_share_chart'], dict_images['client_share_table'], 'Clientes')
+        my_canvas.showPage()
+        GeneralReport().add_client_share(my_canvas, dict_images['supplier_share_chart'], dict_images['supplier_share_table'], 'Proveedores')
+   
     def report_demo(self, df_path, scales_path):
         my_canvas = Canvas("report_demo.pdf", pagesize=letter)
         df = DataLoader().load_month_adv(df_path)
@@ -211,24 +240,16 @@ class GeneralReport():
         # Header
         GeneralReport().add_header(my_canvas)
         
-        # Group share
-        # img_path = DataProcessor().get_group_share(df, df, fig_num)
-        # table_path = DataProcessor().get_group_share_table(df, df, fig_num)
-        # GeneralReport().add_group_share(my_canvas, df, img_path, table_path, 'Grupos')
+        #Get data
+        GeneralReport().generate_imgs(df, "scale_path")
         
-        # Client share
-        img_path = DataProcessor().get_client_share(df, df, fig_num)
-        table_path = DataProcessor().get_client_share_table(df, df, fig_num)
-        GeneralReport().add_client_share(my_canvas, df, img_path, table_path, 'Clientes') # TODO cambiar función de gráfico
+        # Add info to canvas
+        GeneralReport().insert_data_in_canvas(my_canvas)
         
-        # # Supplier share
-        # img_path = DataProcessor().get_group_share(df, df, fig_num) #TODO change to supplier share
-        # table_path = DataProcessor().get_group_share_table(df, df, fig_num) #TODO change to supplier table
-        # GeneralReport().add_info(my_canvas, df, img_path, table_path, 'Proveedores') #TODO check if good results exists here
-        
-        # Canvas save
+        # Save canvas
         my_canvas.save()
-        
+    
+dict_images = {}
 db_path = './Data/montly_data/01-2020/consolidado_01-2020.csv'
 scale_path = './Data/supplier_data_v1.1/suppliers.csv'
 fig_num = 1 #TODO make global var
