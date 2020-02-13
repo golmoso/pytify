@@ -267,12 +267,17 @@ class DataProcessor():
         img_path = string.
 
         """
+        
+        # Exclude values that represent less than 1 percent
+        def autopct_more_than_1(pct):
+            return ('%1.f%%' % pct) if pct > 1 else ''
+        
         # Group share cumulative
         share_by_group = DataProcessor().anual_share_by(full_df, 'Grupo')
         img_path = "group_share_pie.png"
     
         fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
-        wedges, texts, autotexts = ax.pie(share_by_group, autopct='%1.1f%%', textprops=dict(color="w"))
+        wedges, texts, autotexts = ax.pie(share_by_group, autopct=autopct_more_than_1, textprops=dict(color="w"))
         ax.legend(wedges, share_by_group.index,
                   title="Grupo",
                   loc="center left",
@@ -283,7 +288,16 @@ class DataProcessor():
         plt.savefig(img_path)
         plt.show()
         return img_path
-    
+        
+        # # Group share cumulative
+        # share_by_group = DataProcessor().anual_share_by(full_df, 'Grupo')
+        # plt.pie(share_by_group['Inversion Total'], labels=share_by_group.index, 
+        #         startangle=90, autopct='%1.1f%%')
+        # plt.title("Group Share")
+        # img_path = "group_share_pie.png"
+        # plt.savefig(img_path)
+        # plt.show()
+        # return img_path
     def get_group_share_table(self, full_df, scale_df, fig_num):
         share_by_group = DataProcessor().anual_share_by(full_df, 'Grupo')
         fig, ax = plt.subplots(figsize=(3, 2)) # set size frame
@@ -312,25 +326,70 @@ class DataProcessor():
         img_path = string.
 
         """
-        # Group share cumulative
+        # Exclude values that represent less than 1 percent
+        def autopct_more_than_1(pct):
+            return ('%1.f%%' % pct) if pct > 2 else ''
+        
+        # Client share cumulative
         share_by_client = DataProcessor().anual_share_by(full_df, 'Cliente grupo 1')
         img_path = "client_share_pie.png"
     
-        fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
-        wedges, texts, autotexts = ax.pie(share_by_client, autopct='%1.1f%%', textprops=dict(color="w"))
-        ax.legend(wedges, share_by_client.index,
-                  title="Cliente",
-                  loc="center left",
-                  bbox_to_anchor=(1, 0, 0.5, 1))
+        # Normalize and sort values
+        investment_values = share_by_client['Inversion Total'].values
+        share_by_client['Normalized'] = investment_values/investment_values.sum()*100
+        share_by_client = share_by_client.sort_values(['Normalized'], ascending= False)
         
-        plt.setp(autotexts, size=9, weight="bold")
+        # Plot and labels
+        fig1, ax = plt.subplots(figsize=(9, 5))
+        p,t,a = ax.pie(share_by_client['Normalized'].values,
+                       autopct=autopct_more_than_1, textprops=dict(color="w"))
+        ax.axis('equal')
+        h,l = zip(*[(h,lab) for h,lab,i in zip(p,share_by_client.index.values,
+                                               share_by_client['Normalized'].values) if i > 1])
+        ax.legend(h, l,loc="best", bbox_to_anchor=(1,1))
+        plt.setp(a, size=9, weight="bold")
         ax.set_title("Client share")
+        
+        # Save img
         plt.savefig(img_path)
         plt.show()
         return img_path
+
+        
+        ######################## Client share
+        share_by_client = DataProcessor().anual_share_by(full_df, 'Cliente grupo 1')
+        fig1, ax = plt.subplots()
+        
+        # Normalize and sort values
+        investment_values = share_by_client['Inversion Total'].values
+        share_by_client['Normalized'] = investment_values/investment_values.sum()*100
+        share_by_client = share_by_client.sort_values(['Normalized'], ascending= False)
+    
+        # Plot and labels
+        p,t,a = ax.pie(share_by_client['Normalized'].values,
+                        autopct=autopct_more_than_1)
+        ax.axis('equal')
+        h,l = zip(*[(h,lab) for h,lab,i in zip(p,share_by_client.index.values,
+                                                share_by_client['Normalized'].values) if i > 1])
+        ax.legend(h, l,loc="best", bbox_to_anchor=(1, 0, 0.5, 1))
+        # ax.legend(wedges, share_by_client.index,
+        #   title="Cliente",
+        #   loc="center left",
+        #   bbox_to_anchor=(1, 0, 0.5, 1))
+        plt.setp(t, size=9, weight="bold")
+
+        # Plot info
+        plt.title("Client Share")
+        img_path = "client_share_cum.png"
+        plt.savefig(img_path)
+        plt.show()
+        return img_path
+        ######################## END Client share
+    
     def get_client_share_table(self, full_df, scale_df, fig_num):
         share_by_client = DataProcessor().anual_share_by(full_df, 'Cliente grupo 1')
-        fig, ax = plt.subplots(figsize=(3, 2)) # set size frame
+        share_by_client = share_by_client.sort_values(['Inversion Total'], ascending=False)[:15]
+        fig, ax = plt.subplots(figsize=(4.2, 5)) # set size frame
         img_path = "client_share_table.png"
         ax.xaxis.set_visible(False)  # hide the x axis
         ax.yaxis.set_visible(False)  # hide the y axis
@@ -338,7 +397,7 @@ class DataProcessor():
         tabla = table(ax, share_by_client, loc='upper right', colWidths=[0.17]*len(share_by_client.columns))  # where df is your data frame
         tabla.auto_set_font_size(False) # Activate set fontsize manually
         tabla.set_fontsize(10) # if ++fontsize is necessary ++colWidths
-        tabla.scale(3, 1.2) # change size table
+        tabla.scale(2, 1.5) # change size table
         plt.savefig(img_path, transparent=True)
         return img_path
     

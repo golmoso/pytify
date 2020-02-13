@@ -100,7 +100,7 @@ class GeneralReport():
         right_frame.addFromList(right_flowables, my_canvas)
         # my_canvas.save()
         
-    def add_info(self, canvas, df, img_path, table_path, title):
+    def add_group_share(self, canvas, df, img_path, table_path, title):
         #File info
         page_width, page_height = letter #keep for later
         styles = getSampleStyleSheet()
@@ -152,7 +152,58 @@ class GeneralReport():
         left_frame.addFromList(left_flowables, canvas)
         right_frame.addFromList(right_flowables, canvas)
         # canvas.save() #TODO sacar esta linea
-  
+    def add_client_share(self, canvas, df, img_path, table_path, title):
+        #File info
+        page_width, page_height = letter #keep for later
+        styles = getSampleStyleSheet()
+        normal = styles['Normal']
+        normal.alignment = TA_LEFT
+        centered_heading = styles['Heading1']
+        centered_heading.alignment = TA_CENTER
+        centered_normal = styles['Normal']
+        centered_normal.alignment = TA_CENTER
+        heading = styles['Heading1']
+
+        # Frames & flowables
+        top_frame = Frame(inch, 7.5*inch, width=1.5*inch, height=0.5*inch, showBoundary=1)
+        left_frame = Frame(inch, 3.5*inch, width=3*inch, height=4*inch, showBoundary=1)
+        right_frame = Frame(4*inch, 3.5*inch, width=4*inch, height=4*inch, showBoundary=1)
+        
+        top_flowables = []
+        left_flowables = []
+        right_flowables = []
+        
+        # Brief
+        # get_brief()
+        title = title
+        brief_text = "Quien hace tanta bulla y ni deja."
+        top_flowables.append(Paragraph(title, normal))   
+        
+        
+        # Chart
+        img = utils.ImageReader(img_path)
+        img_width, img_height = img.getSize()
+        desired_width = 3.9*inch
+        aspect = img_height / float(img_width)
+        img = Image(img_path, width=desired_width,
+        height=(desired_width * aspect))
+        right_flowables.append(img)
+        
+        # Table
+        img = utils.ImageReader(table_path)
+        img_width, img_height = img.getSize()
+        desired_width = 2.9*inch
+        aspect = img_height / float(img_width)
+        img = Image(table_path, width=desired_width,
+        height=(desired_width * aspect))
+        left_flowables.append(Spacer(1, 0.1*inch))
+        left_flowables.append(img)
+        
+        # Add from lists
+        top_frame.addFromList(top_flowables, canvas)
+        left_frame.addFromList(left_flowables, canvas)
+        right_frame.addFromList(right_flowables, canvas)
+        # canvas.save() #TODO sacar esta linea
     def report_demo(self, df_path, scales_path):
         my_canvas = Canvas("report_demo.pdf", pagesize=letter)
         df = DataLoader().load_month_adv(df_path)
@@ -161,14 +212,14 @@ class GeneralReport():
         GeneralReport().add_header(my_canvas)
         
         # Group share
-        img_path = DataProcessor().get_group_share(df, df, fig_num)
-        table_path = DataProcessor().get_group_share_table(df, df, fig_num)
-        GeneralReport().add_info(my_canvas, df, img_path, table_path, 'Grupos')
+        # img_path = DataProcessor().get_group_share(df, df, fig_num)
+        # table_path = DataProcessor().get_group_share_table(df, df, fig_num)
+        # GeneralReport().add_group_share(my_canvas, df, img_path, table_path, 'Grupos')
         
         # Client share
         img_path = DataProcessor().get_client_share(df, df, fig_num)
         table_path = DataProcessor().get_client_share_table(df, df, fig_num)
-        GeneralReport().add_info(my_canvas, df, img_path, table_path, 'Clientes')
+        GeneralReport().add_client_share(my_canvas, df, img_path, table_path, 'Clientes') # TODO cambiar función de gráfico
         
         # # Supplier share
         # img_path = DataProcessor().get_group_share(df, df, fig_num) #TODO change to supplier share
